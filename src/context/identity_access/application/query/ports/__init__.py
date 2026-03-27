@@ -1,0 +1,1 @@
+from .i_user_query_repository import IUserQueryRepository

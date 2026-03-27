@@ -1,0 +1,1 @@
+from .profile_beanie_repository import ProfileBeanieRepository
