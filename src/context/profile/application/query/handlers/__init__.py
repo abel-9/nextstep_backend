@@ -1,0 +1,1 @@
+from .get_my_profile_query_handler import GetMyProfileQueryHandler

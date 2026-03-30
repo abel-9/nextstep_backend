@@ -11,3 +11,8 @@ class GetUsersQuery:
 @dataclass
 class GetUserByIdQuery:
     user_id: str
+
+
+@dataclass
+class GetMeQuery:
+    token: str

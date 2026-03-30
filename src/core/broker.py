@@ -1,17 +1,30 @@
-from functools import lru_cache
+from typing import Generator
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request
 
-# massahge broker interface
-from src.context.shared_kernel.application.ports import IMessageBroker
-
-# RabitMQ Addapter
-from src.context.shared_kernel.infrastructure.addapters import RabbitMQAdapter
-
-# Settings for the message broker
+# settings
 from src.core.settings import settings
 
+# Interfaces
+from src.context.shared_kernel.application.ports import IMessageBroker
 
-@lru_cache
-def get_message_broker() -> IMessageBroker:
-    return RabbitMQAdapter(
-        host=settings.RABBITMQ_HOST, exchange_name=settings.RABBITMQ_EXCHANGE_NAME
+# Addapters
+from src.context.shared_kernel.infrastructure.addapters import RabbitMQAdapter
+
+
+@asynccontextmanager
+async def broker_lifespan(app: FastAPI):
+    broker = RabbitMQAdapter(
+        host=settings.RABBITMQ_HOST,
+        exchange_name=settings.RABBITMQ_EXCHANGE_NAME,
+        queue_name=settings.QUEUE_NAME,
     )
+    await broker.connect()
+    app.state.message_broker = broker
+    print("✅ Broker initialized")
+    try:
+        yield broker
+    finally:
+
+        await broker.close()
+        print("🛑 Broker closed")

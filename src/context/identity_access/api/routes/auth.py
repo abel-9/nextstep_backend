@@ -18,12 +18,14 @@ from src.context.identity_access.application.command.commands import (
     VerifyEmailCommand,
 )
 
-# Dependencies
-from src.context.identity_access.api.dependencies import (
-    SignUpLocalDep,
-    SignInLocalDep,
-    VerifyEmailDep,
-)
+# # Dependencies
+# from src.context.identity_access.api.dependencies import (
+#     SignUpLocalDep,
+#     SignInLocalDep,
+#     VerifyEmailDep,
+# )
+
+from src.core.mediator import Mediator
 
 router = APIRouter(
     prefix="/auth",
@@ -32,22 +34,21 @@ router = APIRouter(
 
 
 @router.post("/signup")
-async def signup(request: SignupRequest, use_case: SignUpLocalDep):
+async def signup(request: SignupRequest, mediator: Mediator):
     cmd = SignUpCommand(email=request.email, password=request.password)
-    await use_case.handle(cmd=cmd)
+    await mediator.send(request=cmd)
 
 
 @router.post("/verify-email")
-async def verify_email(request: VerifyEmailRequest, use_case: VerifyEmailDep):
+async def verify_email(request: VerifyEmailRequest, mediator: Mediator):
     cmd = VerifyEmailCommand(email=request.email, otp=request.otp)
-    await use_case.handle(cmd=cmd)
+    await mediator.send(request=cmd)
 
 
 @router.post("/signin", response_model=TokenResponse | None)
 async def signin(
     request: Annotated[SigninRequest, Depends(SigninRequest.as_form)],
-    use_case: SignInLocalDep,
+    mediator: Mediator,
 ):
     cmd = SignInCommand(email=request.email, password=request.password)
-    res = await use_case.handle(cmd=cmd)
-    return res
+    return await mediator.send(request=cmd)

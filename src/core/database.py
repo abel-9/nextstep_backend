@@ -15,29 +15,27 @@ from src.context.profile.infrastructure.models import ProfileModel
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
-# Create a global client to reuse connection pooling
-client = AsyncIOMotorClient(settings.DB_URL)
 
-
-async def lifespan(app: FastAPI):
+@asynccontextmanager
+async def database_lifespan(app: FastAPI):
+    client = AsyncIOMotorClient(settings.DB_URL)
     db = client[settings.WRITE_DB_NAME]
     await init_beanie(
         database=db, document_models=[UserModel, VerificationModel, ProfileModel]
     )
-    print("Database connection established.")
-    print("Beanie initialized")
-    yield
-    print("Shutting down application.")
-    client.close()
-    print("Database connection closed.")
+
+    app.state.db_client = client
+    print("✅ Database initialized")
+    try:
+        yield client
+    finally:
+        client.close()
+        print("🛑 Database closed")
 
 
-async def get_db():
-    """Dependency that yields the MongoDB database instance."""
-    db = client[settings.WRITE_DB_NAME]
+async def get_db(request: Request):
+    db = request.app.state.db_client[settings.WRITE_DB_NAME]
     try:
         yield db
     finally:
-        # For MongoDB/Motor, you generally don't need to close
-        # the client after every request, but you can add cleanup here.
         pass

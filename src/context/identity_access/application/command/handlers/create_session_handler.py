@@ -7,7 +7,7 @@ from src.context.identity_access.application.command.commands import (
 )
 
 # Application Ports
-from src.context.identity_access.application.ports import ITokenService
+from src.context.shared_kernel.application.ports import ITokenService
 
 # DTOS
 from src.context.identity_access.application.command.dtos import (

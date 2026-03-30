@@ -28,7 +28,7 @@ class SignUpLocalUseCase:
         self.__verification_repository = verification_repository
         self.__hash_service = hash_service
 
-    async def handle(self, cmd: SignUpCommand):
+    async def __call__(self, cmd: SignUpCommand):
         user = await self.__user_repository.get_by_email(cmd.email)
         user_exists = True
         if not user:

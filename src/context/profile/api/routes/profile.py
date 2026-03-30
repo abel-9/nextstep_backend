@@ -1,21 +1,22 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from typing import Annotated
 
-router = APIRouter(prefix="/profile", tags=["Profile"])
+# Queries
+from src.context.profile.application.query.queries import GetMyProfileQuery
+
+# Dependencies
+from src.core.mediator import get_mediator, IMediator
+from src.core.oauth import TOKEN
+
+router = APIRouter(prefix="/profile")
 
 
 @router.get("")
-def get_profile():
-    return {"message": "User profile details"}
-
-
-@router.post("")
-def create_profile():
-    return {"message": "Profile created successfully"}
-
-
-@router.put("")
-def update_profile(profile_id: str):
-    return {"message": f"Profile with id {profile_id} updated successfully"}
+async def get_profile(
+    token: TOKEN, mediator: Annotated[IMediator, Depends(get_mediator)]
+):
+    query = GetMyProfileQuery(token=token)
+    return await mediator.send(request=query)
 
 
 @router.delete("")

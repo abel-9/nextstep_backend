@@ -1,3 +1,6 @@
+from typing import Annotated
+from fastapi import Depends
+
 from mediator.event import LocalEventBus
 from mediator.request import LocalRequestBus
 from functools import lru_cache
@@ -15,3 +18,6 @@ request_bus = LocalRequestBus()
 @lru_cache()
 def get_mediator() -> IMediator:
     return PythonMediator(event_bus=event_bus, request_bus=request_bus)
+
+
+Mediator = Annotated[IMediator, Depends(get_mediator)]

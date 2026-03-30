@@ -28,7 +28,11 @@ class Settings(BaseSettings):
 
     # Message Broker
     RABBITMQ_HOST: str
-    RABBITMQ_EXCHANGE_NAME: str
+    RABBITMQ_EXCHANGE_NAME: str | None = None
+    QUEUE_NAME: str
+
+    # OAUTH
+    OAUTH_TOKEN_URL: str
 
 
 settings = Settings()

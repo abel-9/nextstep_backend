@@ -3,11 +3,13 @@ from typing import Annotated
 
 # shared dependencies
 from src.core.mediator import get_mediator, IMediator
+from src.core.oauth import TOKEN
 
 # Queries
 from src.context.identity_access.application.query.queries import (
     GetUsersQuery,
     GetUserByIdQuery,
+    GetMeQuery,
 )
 
 # Response
@@ -32,6 +34,12 @@ async def get_users(
             page=query.page, page_size=query.size, is_verified=query.is_verified
         )
     )
+
+
+@router.get("/me", response_model=UserResponse)
+async def get_me(token: TOKEN, mediator: Annotated[IMediator, Depends(get_mediator)]):
+    query = GetMeQuery(token=token)
+    return await mediator.send(query)
 
 
 @router.get("/{user_id}", response_model=UserResponse | None)

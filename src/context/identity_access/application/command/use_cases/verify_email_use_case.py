@@ -28,15 +28,20 @@ from src.context.identity_access.application.exceptions import (
     OtpExpiredError,
 )
 
+# Enums
+from src.context.shared_kernel.domain.enums import UserEventType
+
 
 class VerifyEmailUseCase:
     def __init__(
-        self, verification_repository: IVerificationRepository, event_bus: IMediator
+        self,
+        verification_repository: IVerificationRepository,
+        event_bus: IMediator,
     ):
         self._verification_repository = verification_repository
         self._event_bus = event_bus
 
-    async def handle(self, cmd: VerifyEmailCommand):
+    async def __call__(self, cmd: VerifyEmailCommand):
         verification_entity = (
             await self._verification_repository.get_one_by_identity_type_token(
                 identity=EmailStr(cmd.email),

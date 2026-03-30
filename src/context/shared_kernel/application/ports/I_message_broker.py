@@ -5,7 +5,19 @@ from abc import ABC, abstractmethod
 
 class IMessageBroker(ABC):
     @abstractmethod
-    def publish(self, topic: str, message: dict) -> None:
+    async def connect(self):
+        pass
+
+    @abstractmethod
+    async def publish(self, event_type: str, message: dict) -> None:
+        pass
+
+    @abstractmethod
+    async def consume(self, event_type: str, callback):
+        pass
+
+    @abstractmethod
+    async def close(self) -> None:
         pass
 
     # @abstractmethod

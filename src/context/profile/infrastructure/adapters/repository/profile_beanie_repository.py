@@ -1,7 +1,7 @@
 from src.context.profile.domain.entities import Profile
 from src.context.profile.domain.ports import IProfileRepository
-from src.context.profile.infrustructure.mappers import ProfileMapper
-from src.context.profile.infrustructure.models import ProfileModel
+from src.context.profile.infrastructure.mappers import ProfileMapper
+from src.context.profile.infrastructure.models import ProfileModel
 
 
 class ProfileBeanieRepository(IProfileRepository):
@@ -9,7 +9,10 @@ class ProfileBeanieRepository(IProfileRepository):
         pass
 
     async def get_by_id(self, id):
-        pass
+        profile_model = await ProfileModel.find_one(ProfileModel.id == id)
+        if profile_model:
+            return ProfileMapper.from_beanie_profile(profile_model)
+        return None
 
     async def remove(self, entity):
         pass

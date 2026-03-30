@@ -5,7 +5,7 @@ import jwt
 from src.core.settings import settings
 
 # The interface
-from src.context.identity_access.application.ports import ITokenService
+from src.context.shared_kernel.application.ports import ITokenService
 
 # Infrastructure Exceptions
 from src.context.identity_access.infrastructure.exceptions import (

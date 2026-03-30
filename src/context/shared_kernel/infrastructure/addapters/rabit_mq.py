@@ -1,58 +1,56 @@
-from datetime import datetime, timezone
-from typing import Any, Dict
 import json
-import uuid
-import pika
+import asyncio
+import aio_pika
+from typing import Callable, Any
 
-# port definition
+# Assuming these are your existing port/type definitions
 from src.context.shared_kernel.application.ports import IMessageBroker
-
-# Type definitions for the message structure
 from src.context.shared_kernel.domain.events import EventMessage
 
 
 class RabbitMQAdapter(IMessageBroker):
-    def __init__(
-        self, host: str = "localhost", exchange_name: str = "nextstep.events"
-    ) -> None:
-        self.host: str = host
-        self.exchange_name: str = exchange_name
+    def __init__(self, host: str, exchange_name: str | None, queue_name: str) -> None:
+        self.host = host
+        self.exchange_name = exchange_name or ""
+        self.queue_name = queue_name
+        self.connection: aio_pika.RobustConnection | None = None
+        self.channel: aio_pika.RobustChannel | None = None
 
-        # Connection parameters with explicit typing
-        self.connection = pika.BlockingConnection(
-            params=pika.ConnectionParameters(host=self.host)
-        )
-        self.channel = self.connection.channel()
+    async def connect(self):
+        # connect_robust handles automatic reconnects for you
+        self.connection = await aio_pika.connect_robust(f"amqp://{self.host}/")
+        self.channel = await self.connection.channel()
 
-        self.channel.exchange_declare(
-            exchange=self.exchange_name, exchange_type="topic", durable=False
-        )
+    async def consume(self, event_type: str, callback: Callable):
+        # Ensure the queue exists
+        queue = await self.channel.declare_queue(event_type, durable=False)
 
-    def publish_event(
-        self, routing_key: str, event_type: str, payload: Dict[str, Any]
-    ) -> None:
-        """
-        Publishes a strictly typed message to RabbitMQ.
-        """
-        # Constructing the message using the TypedDict structure
-        message: EventMessage = {
-            "metadata": {
-                "event_id": str(uuid.uuid4()),
-                "event_type": event_type,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            },
-            "data": payload,
-        }
+        # Define a wrapper to handle the message processing
+        async def on_message(message: aio_pika.IncomingMessage):
+            async with message.process():
+                # Pass the body (parsed) to your domain callback
+                await callback(json.loads(message.body.decode()))
 
-        self.channel.basic_publish(
-            exchange=self.exchange_name,
-            routing_key=routing_key,
-            body=json.dumps(message),
-            properties=pika.BasicProperties(
-                delivery_mode=2, content_type="application/json"
+        await queue.consume(on_message)
+        print(f" [*] Waiting for messages on {event_type}. To exit press CTRL+C")
+
+    async def publish(self, event_type: str, message: dict) -> None:
+        if not self.channel:
+            raise RuntimeError("Adapter not connected. Call connect() first.")
+
+        event_message = EventMessage.create(event_type=event_type, payload=message)
+
+        # Declare queue before publishing (matching your original logic)
+        await self.channel.declare_queue(event_type, durable=False)
+
+        await self.channel.default_exchange.publish(
+            aio_pika.Message(
+                body=json.dumps(event_message.dict()).encode(),
+                delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
             ),
+            routing_key=event_type,
         )
 
-    def close(self) -> None:
-        if self.connection.is_open:
-            self.connection.close()
+    async def close(self) -> None:
+        if self.connection and not self.connection.is_closed:
+            await self.connection.close()

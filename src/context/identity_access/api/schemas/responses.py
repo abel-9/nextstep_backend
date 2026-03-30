@@ -26,4 +26,4 @@ class AccountResponse(BaseModel):
 class UserResponse(BaseModel):
     id: str
     email: str
-    accounts: list[AccountResponse]
+    accounts: Optional[list[AccountResponse]] = None

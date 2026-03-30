@@ -1,2 +1,3 @@
 from .get_users_query_handler import GetUsersQueryHandler
 from .get_user_by_id_query_handler import GetUserByIdQueryHandler
+from .get_me_query_handler import GetMeQueryHandler

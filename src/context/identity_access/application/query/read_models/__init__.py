@@ -15,3 +15,9 @@ class UserReadModel(BaseModel):
     id: str = Field(validation_alias="_id")
     email: str
     accounts: List[AccountReadModel]
+
+
+class MeReadModel(BaseModel):
+    id: str = Field(validation_alias="_id")
+    email: str
+    accounts: List[AccountReadModel]
