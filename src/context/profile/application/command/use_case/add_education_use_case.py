@@ -20,7 +20,7 @@ class AddEducationUseCase:
 
     async def __call__(self, cmd: AddEducationCommand):
         payload = await self.__token_service.verify(token=cmd.token)
-        profile = await self.__profile_repository.get_by_id(cmd.profile_id)
+        profile = await self.__profile_repository.get_by_user_id(payload.get("sub"))
         if not profile:
             raise Exception("No Profile...")
 

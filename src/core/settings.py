@@ -34,5 +34,8 @@ class Settings(BaseSettings):
     # OAUTH
     OAUTH_TOKEN_URL: str
 
+    # Gemini API
+    GEMINI_API_KEY: str
+
 
 settings = Settings()

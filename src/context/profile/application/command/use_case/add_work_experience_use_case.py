@@ -20,12 +20,12 @@ class AddWorkExperienceUseCase:
 
     async def __call__(self, cmd: AddWorkExperienceCommand):
         payload = await self.__token_service.verify(token=cmd.token)
-        profile = await self.__profile_repository.get_by_id(cmd.profile_id)
+        profile = await self.__profile_repository.get_by_user_id(payload.get("sub"))
         if not profile:
-            print("no profile")
+            raise Exception("No Profile...")
 
         if not profile.is_for_user(UserId(payload.get("sub"))):
-            raise Exception("Not your Profile")
+            raise Exception("Not yours...")
 
         profile.add_work_experience(
             company=cmd.company,

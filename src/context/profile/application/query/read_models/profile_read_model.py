@@ -23,5 +23,5 @@ class Education(BaseModel):
 class ProfileReadModel(BaseModel):
     id: str = Field(validation_alias="_id")
     user_id: str
-    # work_experiences: list[WorkExperience]
-    # educations: list[Education]
+    work_experiences: list[WorkExperience]
+    educations: list[Education]

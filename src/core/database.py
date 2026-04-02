@@ -20,9 +20,9 @@ from motor.motor_asyncio import AsyncIOMotorClient
 async def database_lifespan(app: FastAPI):
     client = AsyncIOMotorClient(settings.DB_URL)
     db = client[settings.WRITE_DB_NAME]
-    await init_beanie(
-        database=db, document_models=[UserModel, VerificationModel, ProfileModel]
-    )
+    # await init_beanie(
+    #     database=db, document_models=[UserModel, VerificationModel, ProfileModel]
+    # )
 
     app.state.db_client = client
     print("✅ Database initialized")

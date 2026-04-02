@@ -3,7 +3,6 @@ from typing import Annotated
 
 # the bus instance
 from src.core.mediator import event_bus, get_mediator, request_bus
-from src.core.broker import IMessageBroker
 
 # handlers
 from src.context.identity_access.application.command.handlers import (
@@ -35,6 +34,9 @@ from .dependencies import (
 
 # Global Deps
 from src.context.shared_kernel.dependencies import get_token_service
+
+# shared Interfaces
+from src.context.shared_kernel.application.ports import IMessageBroker
 
 
 def register_identity_handlers(broker: IMessageBroker):

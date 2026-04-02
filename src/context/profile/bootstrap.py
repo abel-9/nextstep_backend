@@ -8,7 +8,13 @@ from src.context.profile.application.command.handlers import create_profile_hand
 from src.context.profile.application.command.use_case import CreateProfileUseCase
 
 # Query Handlers
-from src.context.profile.application.query.handlers import GetMyProfileQueryHandler
+from src.context.profile.application.query.handlers import (
+    GetAllWorkExperiencesQueryHandler,
+    GetAllEducationsQueryHandler,
+    GetEducationQueryHandler,
+    GetMyProfileQueryHandler,
+    GetWorkExperienceQueryHandler,
+)
 
 # Enums
 from src.context.shared_kernel.domain.enums import UserEventType
@@ -56,6 +62,26 @@ def register_profile_handlers():
     # Query Handlers
     request_bus.register(
         GetMyProfileQueryHandler(
+            token_service=get_token_service(), profile_query=get_profile_query()
+        )
+    )
+    request_bus.register(
+        GetEducationQueryHandler(
+            token_service=get_token_service(), profile_query=get_profile_query()
+        )
+    )
+    request_bus.register(
+        GetAllEducationsQueryHandler(
+            token_service=get_token_service(), profile_query=get_profile_query()
+        )
+    )
+    request_bus.register(
+        GetAllWorkExperiencesQueryHandler(
+            token_service=get_token_service(), profile_query=get_profile_query()
+        )
+    )
+    request_bus.register(
+        GetWorkExperienceQueryHandler(
             token_service=get_token_service(), profile_query=get_profile_query()
         )
     )
