@@ -1,0 +1,1 @@
+from .scholarship_listing import ScholarshipListing
