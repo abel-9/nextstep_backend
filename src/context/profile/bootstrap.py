@@ -82,7 +82,10 @@ def register_profile_handlers(vector_db: IVectorDB):
     )
     event_bus.register(
         WorkExperienceCreatedHandler(
-            embedding_service=get_embeder(), vector_db=vector_db
+            embedding_service=get_embeder(),
+            document_vector_repository=get_document_vector_repository(
+                vector_db=vector_db
+            ),
         )
     )
 
