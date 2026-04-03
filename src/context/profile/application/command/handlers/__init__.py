@@ -1,1 +1,3 @@
 from .create_profile_handler import create_profile_handler
+from .education_created_handler import EducationCreatedHandler
+from .work_experience_created_handler import WorkExperienceCreatedHandler

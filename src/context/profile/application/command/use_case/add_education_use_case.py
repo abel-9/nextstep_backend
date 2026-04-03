@@ -10,17 +10,24 @@ from src.context.shared_kernel.application.ports import ITokenService
 # Value Objects
 from src.context.shared_kernel.domain.value_objects import UserId
 
+# Core deps
+from src.core.mediator import IMediator
+
 
 class AddEducationUseCase:
     def __init__(
-        self, profile_repository: IProfileRepository, token_service: ITokenService
+        self,
+        profile_repository: IProfileRepository,
+        token_service: ITokenService,
+        mediator: IMediator,
     ):
         self.__profile_repository = profile_repository
         self.__token_service = token_service
+        self.__mediator = mediator
 
     async def __call__(self, cmd: AddEducationCommand):
         payload = await self.__token_service.verify(token=cmd.token)
-        profile = await self.__profile_repository.get_by_id(cmd.profile_id)
+        profile = await self.__profile_repository.get_by_user_id(payload.get("sub"))
         if not profile:
             raise Exception("No Profile...")
 
@@ -34,3 +41,5 @@ class AddEducationUseCase:
             end_date=cmd.end_date,
         )
         await self.__profile_repository.update(profile)
+        for event in profile.events:
+            await self.__mediator.publish(event)

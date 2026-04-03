@@ -11,11 +11,11 @@ class AddWorkExperienceRequest(BaseModel):
     position: str
     description: str | None
     start_date: datetime
-    end_date: datetime
+    end_date: datetime | None
 
 
 class AddEducationRequest(BaseModel):
     major: str
     description: str | None
     start_date: datetime
-    end_date: datetime
+    end_date: datetime | None

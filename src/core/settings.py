@@ -31,8 +31,16 @@ class Settings(BaseSettings):
     RABBITMQ_EXCHANGE_NAME: str | None = None
     QUEUE_NAME: str
 
+    # Vector DB
+    QDRANT_URL: str
+    COLLECTION_NAME: str
+    VECTOR_SIZE: int
+
     # OAUTH
     OAUTH_TOKEN_URL: str
+
+    # Gemini API
+    GEMINI_API_KEY: str
 
 
 settings = Settings()

@@ -1,1 +1,5 @@
 from .get_my_profile_query_handler import GetMyProfileQueryHandler
+from .get_education_query_handler import GetEducationQueryHandler
+from .get_all_educations_query_handler import GetAllEducationsQueryHandler
+from .get_work_experience_query_handler import GetWorkExperienceQueryHandler
+from .get_all_work_experiences_query_handler import GetAllWorkExperiencesQueryHandler

@@ -24,7 +24,6 @@ async def database_lifespan(app: FastAPI):
         database=db, document_models=[UserModel, VerificationModel, ProfileModel]
     )
 
-    app.state.db_client = client
     print("✅ Database initialized")
     try:
         yield client
@@ -33,9 +32,9 @@ async def database_lifespan(app: FastAPI):
         print("🛑 Database closed")
 
 
-async def get_db(request: Request):
-    db = request.app.state.db_client[settings.WRITE_DB_NAME]
-    try:
-        yield db
-    finally:
-        pass
+# async def get_db(request: Request):
+#     db = request.app.state.db_client[settings.WRITE_DB_NAME]
+#     try:
+#         yield db
+#     finally:
+#         pass

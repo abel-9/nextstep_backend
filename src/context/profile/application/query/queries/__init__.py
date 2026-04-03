@@ -1,1 +1,5 @@
 from .get_my_profile_query import GetMyProfileQuery
+from .get_education_query import GetEducationQuery
+from .get_all_educations_query import GetAllEducationsQuery
+from .get_work_experience_query import GetWorkExperienceQuery
+from .get_all_work_experiences_query import GetAllWorkExperiencesQuery

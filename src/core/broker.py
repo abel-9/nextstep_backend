@@ -1,12 +1,8 @@
-from typing import Generator
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 
 # settings
 from src.core.settings import settings
-
-# Interfaces
-from src.context.shared_kernel.application.ports import IMessageBroker
 
 # Addapters
 from src.context.shared_kernel.infrastructure.addapters import RabbitMQAdapter
