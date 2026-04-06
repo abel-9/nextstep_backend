@@ -38,4 +38,3 @@ class QdrantVectorDBAdapter(IVectorDB):
     async def close(self) -> None:
         if self._client:
             await self._client.close()
-            print("Qdrant connection closed")

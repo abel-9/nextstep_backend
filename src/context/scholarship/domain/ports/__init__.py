@@ -1,0 +1,1 @@
+from .i_scholarship_listing_repository import IScholarshipListingRepository

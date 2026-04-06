@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Request, Query
 from typing import Annotated
 
 # shared dependencies
-from src.core.mediator import get_mediator, IMediator
 from src.core.oauth import TOKEN
 
 # Queries
@@ -27,9 +26,9 @@ router = APIRouter(
 @router.get("", response_model=list[UserResponse])
 async def get_users(
     query: Annotated[GetUsersRequest, Query()],
-    mediator: Annotated[IMediator, Depends(get_mediator)],
+    request: Request,
 ):
-    return await mediator.send(
+    return await request.app.state.container.mediator.send(
         GetUsersQuery(
             page=query.page, page_size=query.size, is_verified=query.is_verified
         )
@@ -37,11 +36,13 @@ async def get_users(
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_me(token: TOKEN, mediator: Annotated[IMediator, Depends(get_mediator)]):
+async def get_me(token: TOKEN, request: Request):
     query = GetMeQuery(token=token)
-    return await mediator.send(query)
+    return await request.app.state.container.mediator.send(query)
 
 
 @router.get("/{user_id}", response_model=UserResponse | None)
-async def get_user(user_id: str, mediator: Annotated[IMediator, Depends(get_mediator)]):
-    return await mediator.send(GetUserByIdQuery(user_id=user_id))
+async def get_user(user_id: str, request: Request):
+    return await request.app.state.container.mediator.send(
+        GetUserByIdQuery(user_id=user_id)
+    )

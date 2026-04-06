@@ -1,0 +1,1 @@
+from .education_created_handler import education_created_handler

@@ -19,11 +19,9 @@ class AddWorkExperienceUseCase:
         self,
         profile_repository: IProfileRepository,
         token_service: ITokenService,
-        mediator: IMediator,
     ):
         self.__profile_repository = profile_repository
         self.__token_service = token_service
-        self.__mediator = mediator
 
     async def __call__(self, cmd: AddWorkExperienceCommand):
         payload = await self.__token_service.verify(token=cmd.token)
@@ -42,5 +40,3 @@ class AddWorkExperienceUseCase:
             end_date=cmd.end_date,
         )
         await self.__profile_repository.update(profile)
-        for event in profile.events:
-            await self.__mediator.publish(event)

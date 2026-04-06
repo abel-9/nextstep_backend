@@ -1,0 +1,1 @@
+from .i_scholarship_listing_query import IScholarshipListingQuery

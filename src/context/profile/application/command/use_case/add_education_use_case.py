@@ -6,12 +6,16 @@ from src.context.profile.domain.ports import IProfileRepository
 
 # Global Ports
 from src.context.shared_kernel.application.ports import ITokenService
+from src.core.interfaces.i_message_broker import IMessageBroker
 
 # Value Objects
 from src.context.shared_kernel.domain.value_objects import UserId
 
-# Core deps
-from src.core.mediator import IMediator
+# Event types
+from src.context.shared_kernel.domain.enums import EducationEventType
+
+# base event message class
+from src.context.shared_kernel.domain.events.event_message import EventMessage
 
 
 class AddEducationUseCase:
@@ -19,11 +23,11 @@ class AddEducationUseCase:
         self,
         profile_repository: IProfileRepository,
         token_service: ITokenService,
-        mediator: IMediator,
+        message_broker: IMessageBroker,
     ):
         self.__profile_repository = profile_repository
         self.__token_service = token_service
-        self.__mediator = mediator
+        self.__message_broker = message_broker
 
     async def __call__(self, cmd: AddEducationCommand):
         payload = await self.__token_service.verify(token=cmd.token)
@@ -34,12 +38,14 @@ class AddEducationUseCase:
         if not profile.is_for_user(UserId(payload.get("sub"))):
             raise Exception("Not yours...")
 
-        profile.add_education(
+        education_created = profile.add_education(
             major=cmd.major,
             description=cmd.description,
             start_date=cmd.start_date,
             end_date=cmd.end_date,
         )
         await self.__profile_repository.update(profile)
-        for event in profile.events:
-            await self.__mediator.publish(event)
+        await self.__message_broker.publish(
+            event_type=EducationEventType.CREATED,
+            event_message=education_created.to_event_message(),
+        )

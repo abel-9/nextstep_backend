@@ -1,11 +1,10 @@
 import json
-import asyncio
 import aio_pika
-from typing import Callable, Any
+from typing import Callable
 
 # Assuming these are your existing port/type definitions
 from src.context.shared_kernel.application.ports import IMessageBroker
-from src.context.shared_kernel.domain.events import EventMessage
+from src.context.shared_kernel.domain.events.event_message import EventMessage
 
 
 class RabbitMQAdapter(IMessageBroker):
@@ -34,11 +33,9 @@ class RabbitMQAdapter(IMessageBroker):
         await queue.consume(on_message)
         print(f" [*] Waiting for messages on {event_type}. To exit press CTRL+C")
 
-    async def publish(self, event_type: str, message: dict) -> None:
+    async def publish(self, event_type: str, event_message: EventMessage) -> None:
         if not self.channel:
             raise RuntimeError("Adapter not connected. Call connect() first.")
-
-        event_message = EventMessage.create(event_type=event_type, payload=message)
 
         # Declare queue before publishing (matching your original logic)
         await self.channel.declare_queue(event_type, durable=False)

@@ -1,2 +1,2 @@
-from .verify_user_handler import VerifyUserHandler
+from .email_verified_handler import EmailVerifiedHandler
 from .create_session_handler import CreateSessionHandler
