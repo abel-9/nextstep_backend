@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from typing_extensions import Annotated
 
 # Request schemas
@@ -18,15 +18,6 @@ from src.context.identity_access.application.command.commands import (
     VerifyEmailCommand,
 )
 
-# # Dependencies
-# from src.context.identity_access.api.dependencies import (
-#     SignUpLocalDep,
-#     SignInLocalDep,
-#     VerifyEmailDep,
-# )
-
-from src.core.mediator import Mediator
-
 router = APIRouter(
     prefix="/auth",
     tags=["auth"],
@@ -34,21 +25,27 @@ router = APIRouter(
 
 
 @router.post("/signup")
-async def signup(request: SignupRequest, mediator: Mediator):
-    cmd = SignUpCommand(email=request.email, password=request.password)
-    await mediator.send(request=cmd)
+async def signup(
+    payload: SignupRequest,
+    req: Request,
+):
+    cmd = SignUpCommand(email=payload.email, password=payload.password)
+    await req.app.state.container.mediator.send(request=cmd)
 
 
 @router.post("/verify-email")
-async def verify_email(request: VerifyEmailRequest, mediator: Mediator):
-    cmd = VerifyEmailCommand(email=request.email, otp=request.otp)
-    await mediator.send(request=cmd)
+async def verify_email(
+    payload: VerifyEmailRequest,
+    req: Request,
+):
+    cmd = VerifyEmailCommand(email=payload.email, otp=payload.otp)
+    await req.app.state.container.mediator.send(request=cmd)
 
 
 @router.post("/signin", response_model=TokenResponse | None)
 async def signin(
-    request: Annotated[SigninRequest, Depends(SigninRequest.as_form)],
-    mediator: Mediator,
+    payload: Annotated[SigninRequest, Depends(SigninRequest.as_form)],
+    req: Request,
 ):
-    cmd = SignInCommand(email=request.email, password=request.password)
-    return await mediator.send(request=cmd)
+    cmd = SignInCommand(email=payload.email, password=payload.password)
+    return await req.app.state.container.mediator.send(request=cmd)

@@ -6,13 +6,13 @@ from typing import Any
 
 class PythonMediator(IMediator):
     def __init__(self, event_bus: LocalEventBus, request_bus: LocalRequestBus):
-        self.__event_bus = event_bus
-        self.__request_bus = request_bus
+        self.event_bus = event_bus
+        self.request_bus = request_bus
 
     async def publish(self, event: Any) -> None:
         # Map our internal Port call to the library's method
-        await self.__event_bus.publish(event)
+        await self.event_bus.publish(event)
 
     async def send(self, request: Any) -> Any:
         # Map our internal Port call to the library's method
-        return await self.__request_bus.execute(request)
+        return await self.request_bus.execute(request)

@@ -6,3 +6,7 @@ class UserEventType(str, Enum):
     REGISTERED = "user.registered"
     SIGNED_OUT = "user.signed_out"
     USER_VERIFIED = "user.verified"
+
+
+class EducationEventType(str, Enum):
+    CREATED = "education.created"

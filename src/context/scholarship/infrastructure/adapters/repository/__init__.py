@@ -1,0 +1,1 @@
+from .scholarship_listing_beanie_repository import ScholarshipListingBeanieRepository

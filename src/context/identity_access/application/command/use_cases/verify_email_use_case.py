@@ -3,11 +3,17 @@ import secrets
 # Commands
 from src.context.identity_access.application.command.commands import VerifyEmailCommand
 
-# shared Interface
-from src.context.shared_kernel.application.ports import IMediator
-
 # Repository Interface
-from src.context.identity_access.domain.ports import IVerificationRepository
+from src.context.identity_access.domain.ports import (
+    IVerificationRepository,
+    IUserRepository,
+)
+
+# shared Interfaces
+from src.context.shared_kernel.application.ports import IMessageBroker
+
+# shared types
+from src.context.shared_kernel.domain.enums import UserEventType
 
 # Value Objects
 from src.context.identity_access.domain.value_objects import (
@@ -19,8 +25,11 @@ from src.context.identity_access.domain.value_objects import (
 # Enums
 from src.context.identity_access.domain.enums import VerificationTypeEnums
 
-# Domain Events
-from src.context.identity_access.domain.events.email_verified import EmailVerifiedEvent
+# Based Event Messages
+from src.context.shared_kernel.domain.events.event_message import EventMessage
+
+# Events
+from src.context.shared_kernel.domain.events import EmailVerifiedEvent
 
 # Application Exceptions
 from src.context.identity_access.application.exceptions import (
@@ -28,18 +37,17 @@ from src.context.identity_access.application.exceptions import (
     OtpExpiredError,
 )
 
-# Enums
-from src.context.shared_kernel.domain.enums import UserEventType
-
 
 class VerifyEmailUseCase:
     def __init__(
         self,
         verification_repository: IVerificationRepository,
-        event_bus: IMediator,
+        user_repository: IUserRepository,
+        message_broker: IMessageBroker,
     ):
         self._verification_repository = verification_repository
-        self._event_bus = event_bus
+        self._user_repository = user_repository
+        self._message_broker = message_broker
 
     async def __call__(self, cmd: VerifyEmailCommand):
         verification_entity = (
@@ -58,5 +66,20 @@ class VerifyEmailUseCase:
             raise OtpExpiredError()
 
         verification_entity.mark_as_used()
+        user_entity = await self._user_repository.get_by_email(email=cmd.email)
+        if not user_entity:
+            # This should never happen, but just in case
+            raise InvalidOtpError()
+
+        user_entity.verify_local_email()
+        await self._user_repository.update(user_entity)
         await self._verification_repository.update(verification_entity)
-        await self._event_bus.publish(EmailVerifiedEvent(email=cmd.email))
+
+        event = EmailVerifiedEvent(
+            email=cmd.email,
+            user_id=user_entity.id.value,
+        )
+        await self._message_broker.publish(
+            event_type=UserEventType.USER_VERIFIED,
+            event_message=event.to_event_message(),
+        )

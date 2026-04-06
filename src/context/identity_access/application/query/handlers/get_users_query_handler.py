@@ -1,6 +1,3 @@
-# mediators
-from src.core.mediator import request_bus
-
 # Queries
 from src.context.identity_access.application.query.queries import GetUsersQuery
 

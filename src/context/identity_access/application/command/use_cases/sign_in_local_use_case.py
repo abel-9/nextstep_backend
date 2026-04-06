@@ -25,13 +25,11 @@ class SignInLocalUseCase:
         self,
         user_repository: IUserRepository,
         hash_service: IHashService,
-        event_bus: IMediator,
-        message_broker: IMessageBroker,
+        mediator: IMediator,
     ):
         self.__user_repository = user_repository
         self.__hash_service = hash_service
-        self.__event_bus = event_bus
-        self.__message_broker = message_broker
+        self.__mediator = mediator
 
     async def __call__(self, cmd: SignInCommand) -> TokenResponseDto:
         user = await self.__user_repository.get_by_email(cmd.email)
@@ -40,9 +38,5 @@ class SignInLocalUseCase:
         hased_pwd = self.__hash_service.hash(cmd.password)
         user.compare_local_account_secret(hased_pwd)
 
-        token = await self.__event_bus.send(CreateSessionCommand(user_id=user.id.value))
-        self.__message_broker.publish(
-            event_type="user.signed_in",
-            message={"user_id": user.id.value, "email": user.email.value},
-        )
+        token = await self.__mediator.send(CreateSessionCommand(user_id=user.id.value))
         return token

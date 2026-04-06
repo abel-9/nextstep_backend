@@ -1,23 +1,26 @@
-from typing import Annotated
-from fastapi import Depends
+from contextlib import asynccontextmanager
 
 from mediator.event import LocalEventBus
 from mediator.request import LocalRequestBus
-from functools import lru_cache
+
+# Core Container
+from src.core.container import AppContainer
 
 # the interface for the bus
 from src.context.shared_kernel.application.ports import IMediator
 
 # the adapter for the event bus
-from src.context.shared_kernel.infrastructure.addapters import PythonMediator
-
-event_bus = LocalEventBus()
-request_bus = LocalRequestBus()
+from src.core.adapters import PythonMediatorAdapter
 
 
-@lru_cache()
-def get_mediator() -> IMediator:
-    return PythonMediator(event_bus=event_bus, request_bus=request_bus)
-
-
-Mediator = Annotated[IMediator, Depends(get_mediator)]
+@asynccontextmanager
+async def mediator_lifespan(container: AppContainer):
+    event_bus = LocalEventBus()
+    request_bus = LocalRequestBus()
+    mediator = PythonMediatorAdapter(event_bus=event_bus, request_bus=request_bus)
+    container.set_mediator(mediator)
+    print("✅ Mediator initialized")
+    try:
+        yield mediator
+    finally:
+        print("🛑 Mediator closed")

@@ -117,7 +117,6 @@ class ScholarshipListing(Entity[ListingId]):
         validated_eligibility_summary = cls.__validate_non_empty(
             eligibility_summary, "eligibility_summary"
         )
-        normalized_tags = cls.__normalize_tags(tags)
         return cls(
             id=ListingId.generate(),
             title=validated_title,
@@ -127,7 +126,7 @@ class ScholarshipListing(Entity[ListingId]):
             amount=amount,
             deadline=deadline,
             eligibility_summary=validated_eligibility_summary,
-            tags=normalized_tags,
+            tags=tags,
             location=location,
             status=ListingStatus.DRAFT,
             source=source,

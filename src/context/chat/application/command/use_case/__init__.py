@@ -1,0 +1,1 @@
+from .create_education_document_use_case import CreateEducationDocumentUseCase

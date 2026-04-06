@@ -1,0 +1,1 @@
+from .scholarship_listing_read_model import ScholarshipListingReadModel
