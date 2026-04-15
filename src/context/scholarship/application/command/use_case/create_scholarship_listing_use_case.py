@@ -1,8 +1,10 @@
 from src.context.scholarship.application.command.commands import (
     CreateScholarshipListingCommand,
 )
+from src.core.interfaces import IMessageBroker
 from src.context.scholarship.domain.entities import Provider, ScholarshipListing
 from src.context.scholarship.domain.ports import IScholarshipListingRepository
+from src.context.shared_kernel.domain.enums import ScholarshipEventType
 from src.context.scholarship.domain.value_object import (
     Location,
     Money,
@@ -12,8 +14,13 @@ from src.context.scholarship.domain.value_object import (
 
 
 class CreateScholarshipListingUseCase:
-    def __init__(self, listing_repository: IScholarshipListingRepository):
+    def __init__(
+        self,
+        listing_repository: IScholarshipListingRepository,
+        message_broker: IMessageBroker,
+    ):
         self.__listing_repository = listing_repository
+        self.__message_broker = message_broker
 
     async def __call__(self, cmd: CreateScholarshipListingCommand) -> None:
         await self.execute(cmd=cmd)
@@ -52,4 +59,10 @@ class CreateScholarshipListingUseCase:
             ),
             source=source,
         )
+
+        scholarship_created = listing.to_created_event()
         await self.__listing_repository.save(listing)
+        await self.__message_broker.publish(
+            event_type=ScholarshipEventType.CREATED,
+            event_message=scholarship_created.to_event_message(),
+        )

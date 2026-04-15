@@ -10,3 +10,11 @@ class UserEventType(str, Enum):
 
 class EducationEventType(str, Enum):
     CREATED = "education.created"
+
+
+class WorkExperienceEventType(str, Enum):
+    CREATED = "work_experience.created"
+
+
+class ScholarshipEventType(str, Enum):
+    CREATED = "scholarship.created"

@@ -23,7 +23,6 @@ router = APIRouter(prefix="/scholarship")
 
 @router.post(
     "",
-    response_model=CreateScholarshipListingResponse,
     status_code=status.HTTP_201_CREATED,
 )
 async def create_scholarship_listing(

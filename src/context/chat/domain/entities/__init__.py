@@ -1,3 +1,7 @@
 from .profile_aggregate import ProfileAggregate
 from .education_document import EducationDocument
+from .work_experience_document import WorkExperienceDocument
+from .scholarship_document import ScholarshipDocument
+from .scholarship_aggregate import ScholarshipAggregate
 from .document_entity import DocumentEntity
+from .profile_document import ProfileDocument

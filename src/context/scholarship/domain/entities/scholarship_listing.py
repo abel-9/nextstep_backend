@@ -1,6 +1,7 @@
 from datetime import date
 
 from src.context.shared_kernel.domain.entities.entity import Entity
+from src.context.shared_kernel.domain.events import ScholarshipCreated
 from src.context.scholarship.domain.enums import ListingStatus
 from src.context.scholarship.domain.value_object import (
     ListingId,
@@ -210,6 +211,17 @@ class ScholarshipListing(Entity[ListingId]):
             return True
         except ValueError:
             return False
+
+    def to_created_event(self) -> ScholarshipCreated:
+        return ScholarshipCreated.from_primitives(
+            listing_id=self.id.value,
+            title=self.__title,
+            description=self.__description,
+            eligibility_summary=self.__eligibility_summary,
+            provider_name=self.__provider.name,
+            tags=self.__tags,
+            deadline=self.__deadline,
+        )
 
     def __touch(self) -> None:
         self.__updated_at = date.today()

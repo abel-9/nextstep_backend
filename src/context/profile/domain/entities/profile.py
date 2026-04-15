@@ -12,7 +12,10 @@ from src.context.profile.domain.value_objects import ProfileId
 from src.context.shared_kernel.domain.value_objects.user_id import UserId
 
 # Events
-from src.context.shared_kernel.domain.events import EducationCreated
+from src.context.shared_kernel.domain.events import (
+    EducationCreated,
+    WorkExperienceCreated,
+)
 
 
 class Profile(Entity[ProfileId]):
@@ -53,7 +56,7 @@ class Profile(Entity[ProfileId]):
         description,
         start_date,
         end_date,
-    ):
+    ) -> WorkExperienceCreated:
         work_exp = WorkExperience.create(
             company,
             position,
@@ -63,16 +66,15 @@ class Profile(Entity[ProfileId]):
         )
 
         self.__work_experiences.append(work_exp)
-        # self.events.append(
-        #     WorkExperienceCreated(
-        #         id=work_exp.id.value,
-        #         company=work_exp.company,
-        #         position=work_exp.position,
-        #         description=work_exp.description,
-        #         start_date=work_exp.start_date,
-        #         end_date=work_exp.end_date,
-        #     )
-        # )
+
+        return WorkExperienceCreated(
+            work_experience_id=work_exp.id.value,
+            profile_id=self.id.value,
+            user_id=self.__user_id.value,
+            company=work_exp.company,
+            position=work_exp.position,
+            description=work_exp.description,
+        )
 
     def add_education(
         self,

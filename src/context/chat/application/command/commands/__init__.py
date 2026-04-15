@@ -1,2 +1,3 @@
 from .create_education_document_command import CreateEducationDocumentCommand
+from .create_scholarship_document_command import CreateScholarshipDocumentCommand
 from .create_work_experience_command import CreateWorkExperienceCommand

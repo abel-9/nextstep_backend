@@ -54,6 +54,7 @@ class ProfileContainer:
         return AddWorkExperienceUseCase(
             profile_repository=self.get_profile_repository(),
             token_service=self.shared_container.get_token_service(),
+            message_broker=self.app_container.message_broker,
         )
 
     @lru_cache()

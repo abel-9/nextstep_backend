@@ -1,1 +1,3 @@
 from .education_created_handler import education_created_handler
+from .work_experience_created_handler import work_experience_created_handler
+from .scholarship_created_handler import scholarship_created_handler

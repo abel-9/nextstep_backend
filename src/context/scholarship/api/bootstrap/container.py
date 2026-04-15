@@ -42,8 +42,12 @@ class ScholarshipContainer:
     def get_create_scholarship_listing_use_case(
         self,
     ) -> CreateScholarshipListingUseCase:
+        if not self.app_container.message_broker:
+            raise Exception("Message broker is not initialized")
+
         return CreateScholarshipListingUseCase(
-            listing_repository=self.get_scholarship_listing_repository()
+            listing_repository=self.get_scholarship_listing_repository(),
+            message_broker=self.app_container.message_broker,
         )
 
     @lru_cache()

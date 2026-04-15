@@ -1,1 +1,5 @@
 from .create_education_document_use_case import CreateEducationDocumentUseCase
+from .create_work_experience_document_use_case import (
+    CreateWorkExperienceDocumentUseCase,
+)
+from .create_scholarship_document_use_case import CreateScholarshipDocumentUseCase

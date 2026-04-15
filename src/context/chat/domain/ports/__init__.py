@@ -1,1 +1,2 @@
 from .i_profile_document_repository import IProfileDocumentRepository
+from .i_scholarship_document_repository import IScholarshipDocumentRepository

@@ -43,3 +43,5 @@
 from .event_message import EventMessage
 from .email_verified import EmailVerifiedEvent
 from .education_created import EducationCreated
+from .work_experience_created import WorkExperienceCreated
+from .scholarship_created import ScholarshipCreated

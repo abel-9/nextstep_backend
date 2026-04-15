@@ -10,3 +10,9 @@ def register_chat_command_handlers(container: ChatContainer):
     container.app_container.mediator.get_event_bus().register(
         container.get_create_education_document_use_case()
     )
+    container.app_container.mediator.get_event_bus().register(
+        container.get_create_work_experience_document_use_case()
+    )
+    container.app_container.mediator.get_event_bus().register(
+        container.get_create_scholarship_document_use_case()
+    )

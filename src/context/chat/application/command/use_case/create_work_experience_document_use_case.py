@@ -1,18 +1,15 @@
-# Commands
-from src.context.chat.application.command.commands import CreateEducationDocumentCommand
-
-# Ports
+from src.context.chat.application.command.commands import CreateWorkExperienceCommand
+from src.context.chat.domain.entities import ProfileAggregate
 from src.context.chat.domain.ports import IProfileDocumentRepository
+from src.context.chat.domain.value_objects import (
+    ProfileId,
+    UserId,
+    WorkExperienceMetadata,
+)
 from src.context.shared_kernel.application.ports import IEmbedding
 
-# Domain entities
-from src.context.chat.domain.entities import ProfileAggregate
 
-# Value objects
-from src.context.chat.domain.value_objects import EducationMetadata, ProfileId, UserId
-
-
-class CreateEducationDocumentUseCase:
+class CreateWorkExperienceDocumentUseCase:
     def __init__(
         self,
         profile_document_repository: IProfileDocumentRepository,
@@ -21,12 +18,13 @@ class CreateEducationDocumentUseCase:
         self.__profile_document_repository = profile_document_repository
         self.__embedding = embedding
 
-    async def __call__(self, cmd: CreateEducationDocumentCommand):
-        metadata = EducationMetadata(
-            education_id=cmd.education_id,
-            user_id=cmd.user_id,
+    async def __call__(self, cmd: CreateWorkExperienceCommand):
+        metadata = WorkExperienceMetadata(
+            work_experience_id=cmd.work_experience_id,
             profile_id=cmd.profile_id,
-            major=cmd.major,
+            user_id=cmd.user_id,
+            company=cmd.company,
+            position=cmd.position,
             description=cmd.description,
         )
         vector = await self.__embedding.embed(text=metadata.to_content())
@@ -43,7 +41,7 @@ class CreateEducationDocumentUseCase:
                 education_documents=[],
                 work_experience_documents=[],
             )
-            aggregate.upsert_education(metadata=metadata, vector=vector)
+            aggregate.upsert_work_experience(metadata=metadata, vector=vector)
             profile_vector = await self.__embedding.embed(
                 text=aggregate.compose_profile_content()
             )
@@ -51,10 +49,9 @@ class CreateEducationDocumentUseCase:
             await self.__profile_document_repository.save(aggregate)
             return
 
-        aggregate.upsert_education(metadata=metadata, vector=vector)
+        aggregate.upsert_work_experience(metadata=metadata, vector=vector)
         profile_vector = await self.__embedding.embed(
             text=aggregate.compose_profile_content()
         )
         aggregate.upsert_profile_document(vector=profile_vector)
-
         await self.__profile_document_repository.update(aggregate)

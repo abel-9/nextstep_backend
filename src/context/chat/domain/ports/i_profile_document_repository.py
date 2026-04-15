@@ -4,11 +4,17 @@ from abc import ABC, abstractmethod
 from src.context.chat.domain.entities import ProfileAggregate
 
 
-class IProfileDocumentRepository:
+class IProfileDocumentRepository(ABC):
     @abstractmethod
-    def save(self, education: ProfileAggregate) -> None:
+    async def get_by_profile_id(
+        self, profile_id: str, user_id: str
+    ) -> ProfileAggregate | None:
         pass
 
     @abstractmethod
-    def update(self, education: ProfileAggregate) -> None:
+    async def save(self, profile_aggregate: ProfileAggregate) -> None:
+        pass
+
+    @abstractmethod
+    async def update(self, profile_aggregate: ProfileAggregate) -> None:
         pass
